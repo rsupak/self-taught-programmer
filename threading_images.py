@@ -1,5 +1,6 @@
-import requests
+import concurrent.futures
 import time
+import requests
 
 img_urls = [
     'https://images.unsplash.com/photo-1516117172878-fd2c41f4a759',
@@ -21,13 +22,16 @@ img_urls = [
 
 t1 = time.perf_counter()
 
-for img_url in img_urls:
+def download_img(img_url):
     img_bytes = requests.get(img_url).content
     img_name = img_url.split('/')[3]
     img_name =f'{img_name}.jpg'
     with open(img_name, 'wb') as img_file:
         img_file.write(img_bytes)
         print(f'{img_name} was downloaded...')
+
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    executor.map(download_img, img_urls)
 
 t2 = time.perf_counter()
 
